@@ -15,7 +15,7 @@
     "seed": "node --import tsx/esm src/seed.ts"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "^3.84.1",
+    "@payloadcms/db-sqlite": "^3.84.1",
     "@payloadcms/next": "^3.84.1",
     "@payloadcms/richtext-lexical": "^3.84.1",
     "@payloadcms/storage-vercel-blob": "^3.84.1",
