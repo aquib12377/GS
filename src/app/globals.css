@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "@tailwindcss/typography";
+
+@theme {
+  --color-accent: #84cc16;
+  --font-family-display: var(--font-bricolage), sans-serif;
+  --font-family-body: var(--font-dm-sans), sans-serif;
+  --font-family-mono: var(--font-jetbrains), monospace;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background-color: #030712;
+  color: #f5f5f5;
+}

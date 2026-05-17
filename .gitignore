@@ -1,0 +1,10 @@
+data/*.db
+data/*.db-journal
+media/
+.next/
+.env
+.env*.local
+node_modules/
+*.log
+dist/
+.turbo/
