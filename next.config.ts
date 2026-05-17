@@ -5,10 +5,16 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        // Vercel Blob storage
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
+      {
+        // Local dev with Vercel Blob (optional local proxy)
         protocol: 'http',
         hostname: 'localhost',
         port: '3000',
-        pathname: '/media/**',
+        pathname: '/api/media/**',
       },
     ],
   },

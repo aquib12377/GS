@@ -1,11 +1,6 @@
-data/*.db
-data/*.db-journal
-media/
 .next/
 .env
 .env*.local
 node_modules/
 *.log
 tsconfig.tsbuildinfo
-dist/
-.turbo/

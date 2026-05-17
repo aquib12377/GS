@@ -10,7 +10,6 @@ export const Media: CollectionConfig = {
     delete: isAuthenticated,
   },
   upload: {
-    staticDir: 'media',
     mimeTypes: ['image/*'],
     imageSizes: [
       {

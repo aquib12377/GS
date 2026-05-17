@@ -1,83 +1,92 @@
 # GS Gaming Blog
 
-A self-hosted gaming guide blog with an admin panel, built with Next.js 16 + Payload CMS 3 + SQLite.
+A gaming guide blog with an auto-generated admin panel, built with Next.js 16 + Payload CMS 3 and deployed on Vercel.
 
 ## Stack
 
-- **Next.js 16** (App Router, Turbopack)
-- **Payload CMS 3** (embedded admin at `/admin`)
-- **SQLite** via `@payloadcms/db-sqlite` — single file, no extra services
-- **Tailwind CSS 4** — dark theme, lime accent
-- **TypeScript 5** — strict mode
+| Layer | Tool |
+|---|---|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| CMS / Admin | Payload CMS 3 — admin at `/admin` |
+| Database | PostgreSQL via [Neon](https://neon.tech) (serverless, free tier) |
+| Media storage | [Vercel Blob](https://vercel.com/storage/blob) |
+| Styling | Tailwind CSS 4, dark theme, lime accent |
+| Language | TypeScript 5 (strict) |
+| Runtime | Node.js 22 |
 
 ---
 
-## Setup (10 steps)
+## Vercel Deployment (10 steps)
 
-### 1. Prerequisites
+### 1. Create a Neon database
 
-- Node.js 22 LTS
-- pnpm 9+
+Go to [neon.tech](https://neon.tech) → New Project → copy the **connection string** (pooled, `?sslmode=require`).
 
-### 2. Clone and install
+### 2. Enable Vercel Blob
+
+In your Vercel project dashboard: **Storage → Blob → Create store** (or connect an existing one).
+
+### 3. Deploy to Vercel
 
 ```bash
-git clone <repo-url>
-cd <repo>
-pnpm install
+# One-click: push this repo to GitHub, then import it in vercel.com/new
+# Or via CLI:
+npm i -g vercel
+vercel
 ```
 
-### 3. Configure environment
+### 4. Add environment variables in Vercel
+
+| Variable | Value |
+|---|---|
+| `PAYLOAD_SECRET` | `openssl rand -base64 32` |
+| `DATABASE_URI` | Neon connection string |
+| `BLOB_READ_WRITE_TOKEN` | Auto-added when you link Blob storage |
+| `NEXT_PUBLIC_SERVER_URL` | `https://your-project.vercel.app` |
+| `SEED_ADMIN_PASSWORD` | A strong password for seeding |
+
+### 5. Redeploy
+
+After adding env vars, trigger a redeploy from the Vercel dashboard. Payload creates the database tables automatically on first boot.
+
+### 6. Run the seed script (optional)
+
+From your local machine with `vercel env pull .env.local`:
 
 ```bash
-cp .env.example .env
-```
-
-Edit `.env`:
-- Set `PAYLOAD_SECRET` to a random string: `openssl rand -base64 32`
-- Set `SEED_ADMIN_PASSWORD` to a strong password
-- Leave `DATABASE_URI` and `NEXT_PUBLIC_SERVER_URL` as-is for local dev
-
-### 4. Create the data directory
-
-```bash
-mkdir -p data
-```
-
-### 5. Start the dev server
-
-```bash
-pnpm dev
-```
-
-The SQLite database (`data/blog.db`) is created automatically on first boot.
-
-### 6. Seed the database (optional)
-
-```bash
+vercel env pull .env.local
 pnpm seed
 ```
 
-Creates: 1 admin user, 3 categories, 2 games, and 2 sample posts.
+This creates the admin user (`admin@example.com`) + 3 categories + 2 games + 2 sample posts.
 
 ### 7. Log in to admin
 
-Open [http://localhost:3000/admin](http://localhost:3000/admin) and sign in with `admin@example.com` and the password from `SEED_ADMIN_PASSWORD`.
+Visit `https://your-project.vercel.app/admin` and sign in.
 
 ### 8. Create a post
 
-In the admin panel: **Posts → Create New**. Fill in title, cover image, content, set status to **Published**, save.
+**Posts → Create New** → fill title, cover image, content, set status to **Published** → Save.
 
 ### 9. View the blog
 
-Open [http://localhost:3000](http://localhost:3000). Published posts appear on the homepage.
+Visit `https://your-project.vercel.app` — published posts appear immediately.
 
-### 10. Build for production
+### 10. Done ✓
+
+---
+
+## Local Development
+
+Pull env vars from your Vercel project (requires `vercel link`):
 
 ```bash
-pnpm build
-pnpm start
+vercel env pull .env.local
+pnpm install
+pnpm dev
 ```
+
+Or create `.env.local` manually from `.env.example` with your Neon + Blob credentials.
 
 ---
 
@@ -86,27 +95,28 @@ pnpm start
 | Collection | Description |
 |---|---|
 | `Users` | Blog authors with `admin` or `editor` roles |
-| `Posts` | Blog posts with Lexical rich text, drafts, versioning |
-| `Categories` | Post categories (Guides, Reviews, Builds, etc.) |
+| `Posts` | Rich text posts with drafts, versioning, auto-slug |
+| `Categories` | Guides, Reviews, Builds, etc. |
 | `Games` | Games with platform tags |
-| `Media` | Uploaded images with auto-generated sizes |
-
----
+| `Media` | Uploads stored in Vercel Blob with 4 auto-generated sizes |
 
 ## Routes
 
 | Route | Description |
 |---|---|
 | `/` | Latest published posts (12/page) |
-| `/posts/[slug]` | Single post with Lexical content |
+| `/posts/[slug]` | Single post with Lexical content + JSON-LD |
 | `/games/[slug]` | All posts for a game |
 | `/categories/[slug]` | All posts in a category |
 | `/admin` | Payload CMS admin panel |
+| `/api/[...slug]` | Payload REST API |
 
----
+## Useful commands
 
-## Deployment
-
-See `CLAUDE.md` for deployment options (Hetzner VPS recommended).
-
-Back up `data/blog.db` and `media/` regularly.
+```bash
+pnpm dev                   # start dev server
+pnpm build                 # production build
+pnpm generate:types        # regenerate payload-types.ts after schema changes
+pnpm generate:importmap    # regenerate admin importMap.js
+pnpm seed                  # seed admin user + sample content
+```
